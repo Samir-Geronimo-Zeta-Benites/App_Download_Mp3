@@ -1,88 +1,254 @@
 // =============================================
-// NETLIFY FUNCTION: descargar.js
-// Esta función actúa como servidor intermediario.
-// Tu app HTML la llama, ella llama a cobalt.tools,
-// y devuelve el link directo al MP3.
+// VARIABLES GLOBALES
 // =============================================
 
-exports.handler = async function (event) {
+// Contador para numerar los inputs (ej: Link #1, Link #2...)
+var contadorLinks = 0;
 
-  // Solo aceptamos peticiones POST
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Método no permitido. Usa POST." })
-    };
+// Referencia al contenedor donde se agregan los inputs
+var listaInputs = document.getElementById("lista-inputs");
+
+// Referencia a la zona donde se muestran mensajes
+var zonaEstado = document.getElementById("zona-estado");
+
+// URL de nuestra Netlify Function (el "servidor")
+// Cuando subas a Netlify, esta ruta funciona automáticamente
+var URL_SERVIDOR = "/.netlify/functions/descargar";
+
+
+// =============================================
+// INICIALIZAR: Crear el primer input al cargar
+// =============================================
+window.onload = function () {
+  agregarInput();
+};
+
+
+// =============================================
+// FUNCIÓN: Agregar un nuevo input de link
+// =============================================
+function agregarInput() {
+  contadorLinks = contadorLinks + 1;
+  var numeroActual = contadorLinks;
+
+  var fila = document.createElement("div");
+  fila.classList.add("fila-input");
+  fila.id = "fila-" + numeroActual;
+
+  var etiqueta = document.createElement("span");
+  etiqueta.classList.add("etiqueta-input");
+  etiqueta.textContent = "#" + numeroActual;
+
+  var input = document.createElement("input");
+  input.type = "text";
+  input.classList.add("input-link");
+  input.placeholder = "https://music.youtube.com/watch?v=...";
+  input.id = "link-" + numeroActual;
+
+  var btnEliminar = document.createElement("button");
+  btnEliminar.classList.add("btn-eliminar");
+  btnEliminar.title = "Eliminar este link";
+  btnEliminar.textContent = "✕";
+
+  btnEliminar.onclick = function () {
+    eliminarFila(fila);
+  };
+
+  fila.appendChild(etiqueta);
+  fila.appendChild(input);
+  fila.appendChild(btnEliminar);
+  listaInputs.appendChild(fila);
+  input.focus();
+  limpiarMensajes();
+}
+
+
+// =============================================
+// FUNCIÓN: Eliminar una fila específica
+// =============================================
+function eliminarFila(fila) {
+  var todasLasFilas = listaInputs.querySelectorAll(".fila-input");
+
+  if (todasLasFilas.length === 1) {
+    var inputDentro = fila.querySelector(".input-link");
+    inputDentro.value = "";
+    mostrarMensaje("ℹ️ No puedes eliminar el último campo, pero se ha limpiado.", "info");
+    return;
   }
 
-  // Leemos el body que mandó el script.js (viene como texto JSON)
-  var body = JSON.parse(event.body);
-  var urlYoutube = body.url;
+  fila.style.transition = "opacity 0.2s, transform 0.2s";
+  fila.style.opacity = "0";
+  fila.style.transform = "translateX(10px)";
 
-  // Verificamos que venga un link
-  if (!urlYoutube) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "No se recibió ningún link." })
-    };
+  setTimeout(function () {
+    fila.remove();
+  }, 200);
+
+  limpiarMensajes();
+}
+
+
+// =============================================
+// FUNCIÓN: Limpiar todos los links (vaciar inputs)
+// =============================================
+function limpiarTodo() {
+  var todosLosInputs = listaInputs.querySelectorAll(".input-link");
+
+  var hayAlgo = false;
+  todosLosInputs.forEach(function (input) {
+    if (input.value.trim() !== "") {
+      hayAlgo = true;
+    }
+  });
+
+  if (!hayAlgo) {
+    mostrarMensaje("ℹ️ Los campos ya están vacíos.", "info");
+    return;
   }
 
-  // -----------------------------------------------
-  // Llamamos a la API de cobalt.tools
-  // Le mandamos el link de YouTube y nos devuelve
-  // un link directo para descargar el audio en MP3
-  // -----------------------------------------------
+  todosLosInputs.forEach(function (input) {
+    input.value = "";
+    input.style.transition = "background 0.2s";
+    input.style.background = "rgba(108, 99, 255, 0.15)";
+    setTimeout(function () {
+      input.style.background = "";
+    }, 300);
+  });
+
+  mostrarMensaje("🧹 ¡Todos los campos han sido limpiados!", "ok");
+}
+
+
+// =============================================
+// FUNCIÓN: Descargar todos los MP3
+// Llama a nuestra Netlify Function (el servidor)
+// =============================================
+async function descargarTodo() {
+  limpiarMensajes();
+
+  var todosLosInputs = listaInputs.querySelectorAll(".input-link");
+  var linksValidos = [];
+  var linksVacios = 0;
+
+  todosLosInputs.forEach(function (input) {
+    var link = input.value.trim();
+    if (link === "") {
+      linksVacios = linksVacios + 1;
+    } else {
+      linksValidos.push(link);
+    }
+  });
+
+  if (linksValidos.length === 0) {
+    mostrarMensaje("⚠️ No hay ningún link ingresado. Agrega al menos uno.", "error");
+    return;
+  }
+
+  mostrarMensaje("⏳ Procesando " + linksValidos.length + " canción(es), espera...", "info");
+
+  // Deshabilitamos el botón mientras se procesa
+  var btnDescargar = document.getElementById("btn-descargar");
+  btnDescargar.disabled = true;
+  btnDescargar.textContent = "⏳ Procesando...";
+
+  // Procesamos cada link uno por uno
+  for (var i = 0; i < linksValidos.length; i++) {
+    var link = linksValidos[i];
+    var numero = i + 1;
+
+    mostrarMensaje("🔍 Buscando canción #" + numero + "...", "info");
+    await procesarYDescargar(link, numero);
+
+    // Pausa entre descargas para no saturar
+    if (i < linksValidos.length - 1) {
+      await esperar(1500);
+    }
+  }
+
+  // Volvemos a habilitar el botón
+  btnDescargar.disabled = false;
+  btnDescargar.textContent = "⬇️ Descargar todo";
+
+  if (linksVacios > 0) {
+    mostrarMensaje("ℹ️ Se ignoraron " + linksVacios + " campo(s) vacío(s).", "info");
+  }
+}
+
+
+// =============================================
+// FUNCIÓN: Llamar al servidor y descargar un MP3
+// =============================================
+async function procesarYDescargar(url, numero) {
   try {
 
-    var respuestaCobalt = await fetch("https://api.cobalt.tools/", {
+    // Le mandamos el link a nuestra Netlify Function
+    var respuesta = await fetch(URL_SERVIDOR, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({
-        url: urlYoutube,          // el link de YouTube que mandó el usuario
-        downloadMode: "audio",    // solo queremos el audio, no el video
-        audioFormat: "mp3",       // formato mp3
-        audioBitrate: "320"       // calidad alta
-      })
-    });
-
-    // Convertimos la respuesta a JSON
-    var dataCobalt = await respuestaCobalt.json();
-
-    // Si cobalt devolvió un error
-    if (!respuestaCobalt.ok || dataCobalt.error) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          error: "Cobalt no pudo procesar el link: " + (dataCobalt.error?.code || "error desconocido")
-        })
-      };
-    }
-
-    // Si todo salió bien, devolvemos el link de descarga a nuestro script.js
-    return {
-      statusCode: 200,
-      headers: {
-        // Esto permite que nuestro HTML pueda recibir la respuesta sin problemas de CORS
-        "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        linkDescarga: dataCobalt.url,   // el link directo al MP3
-        nombreArchivo: dataCobalt.filename || "cancion.mp3"
-      })
-    };
+      body: JSON.stringify({ url: url })
+    });
+
+    var data = await respuesta.json();
+
+    // Si el servidor devolvió un error
+    if (!respuesta.ok || data.error) {
+      mostrarMensaje("❌ Error en canción #" + numero + ": " + (data.error || "error desconocido"), "error");
+      return;
+    }
+
+    // Descargamos el archivo con el link que nos devolvió el servidor
+    var linkDescarga = data.linkDescarga;
+    var nombreArchivo = data.nombreArchivo || ("cancion-" + numero + ".mp3");
+
+    var enlace = document.createElement("a");
+    enlace.href = linkDescarga;
+    enlace.download = nombreArchivo;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+
+    mostrarMensaje("✅ Descargando: " + nombreArchivo, "ok");
 
   } catch (error) {
-
-    // Si hubo un error de red u otro problema
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Error al conectar con cobalt: " + error.message })
-    };
-
+    mostrarMensaje("❌ No se pudo conectar al servidor. ¿Está el proyecto en Netlify?", "error");
   }
+}
 
-};
+
+// =============================================
+// FUNCIÓN AUXILIAR: Esperar X milisegundos
+// =============================================
+function esperar(ms) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, ms);
+  });
+}
+
+
+// =============================================
+// FUNCIÓN: Mostrar un mensaje en la zona de estado
+// =============================================
+function mostrarMensaje(texto, tipo) {
+  var mensaje = document.createElement("div");
+  mensaje.classList.add("mensaje", tipo);
+  mensaje.textContent = texto;
+  zonaEstado.appendChild(mensaje);
+
+  setTimeout(function () {
+    mensaje.style.transition = "opacity 0.4s";
+    mensaje.style.opacity = "0";
+    setTimeout(function () {
+      mensaje.remove();
+    }, 400);
+  }, 5000);
+}
+
+
+// =============================================
+// FUNCIÓN: Limpiar todos los mensajes
+// =============================================
+function limpiarMensajes() {
+  zonaEstado.innerHTML = "";
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MP3 Downloader</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" type="icon" href="icono.html" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Fondo decorativo con burbujas -->
+  <div class="bg-bubbles">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="container">
+
+    <!-- Cabecera -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">🎵</span>
+        <h1>MP3 <span>Downloader</span></h1>
+      </div>
+      <p class="subtitle">Pega tus links y descarga tu música fácilmente</p>
+    </header>
+
+    <!-- Tarjeta principal -->
+    <div class="card">
+
+      <!-- Lista de inputs -->
+      <div id="lista-inputs">
+        <!-- El primer input se crea desde JS -->
+      </div>
+
+      <!-- Botones de acción global -->
+      <div class="acciones-globales">
+        <button id="btn-agregar" onclick="agregarInput()">
+          <span>＋</span> Agregar link
+        </button>
+        <button id="btn-limpiar" class="btn-limpiar" onclick="limpiarTodo()">
+          🧹 Limpiar todo
+        </button>
+        <button id="btn-descargar" class="btn-descargar" onclick="descargarTodo()">
+          ⬇️ Descargar todo
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Zona de estado / mensajes -->
+    <div id="zona-estado"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Solo pega el link directo al archivo <code>.mp3</code> para descargar sin problemas 🎶</p>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

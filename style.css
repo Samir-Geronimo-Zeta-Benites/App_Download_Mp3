@@ -1,0 +1,363 @@
+/* =============================================
+   VARIABLES Y RESET
+============================================= */
+:root {
+  --primario: #6c63ff;
+  --primario-hover: #574fd6;
+  --acento: #ff6584;
+  --acento2: #43d9ad;
+  --fondo: #0f0e17;
+  --fondo-card: #1a1a2e;
+  --fondo-input: #16213e;
+  --texto: #fffffe;
+  --texto-suave: #a7a9be;
+  --borde: #2e2e4a;
+  --sombra: rgba(108, 99, 255, 0.25);
+  --radio: 14px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--fondo);
+  color: var(--texto);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  padding: 30px 15px;
+}
+
+/* =============================================
+   BURBUJAS DE FONDO
+============================================= */
+.bg-bubbles {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-bubbles span {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.08;
+  animation: flotar 10s infinite ease-in-out;
+}
+
+.bg-bubbles span:nth-child(1) { width: 300px; height: 300px; background: var(--primario); top: -80px; left: -80px; animation-delay: 0s; }
+.bg-bubbles span:nth-child(2) { width: 200px; height: 200px; background: var(--acento); top: 60%; right: -60px; animation-delay: 2s; }
+.bg-bubbles span:nth-child(3) { width: 150px; height: 150px; background: var(--acento2); bottom: 10%; left: 20%; animation-delay: 4s; }
+.bg-bubbles span:nth-child(4) { width: 100px; height: 100px; background: var(--primario); top: 40%; left: 5%; animation-delay: 1s; }
+.bg-bubbles span:nth-child(5) { width: 250px; height: 250px; background: var(--acento); bottom: -80px; right: 20%; animation-delay: 3s; }
+.bg-bubbles span:nth-child(6) { width: 80px; height: 80px; background: var(--acento2); top: 20%; right: 15%; animation-delay: 5s; }
+
+@keyframes flotar {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
+
+/* =============================================
+   CONTENEDOR PRINCIPAL
+============================================= */
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 700px;
+}
+
+/* =============================================
+   HEADER
+============================================= */
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  animation: bajarFade 0.6s ease both;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  animation: pulsar 2s infinite;
+}
+
+@keyframes pulsar {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.header h1 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--texto);
+}
+
+.header h1 span {
+  color: var(--primario);
+}
+
+.subtitle {
+  color: var(--texto-suave);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* =============================================
+   TARJETA PRINCIPAL
+============================================= */
+.card {
+  background: var(--fondo-card);
+  border: 1px solid var(--borde);
+  border-radius: 22px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(108,99,255,0.1);
+  animation: bajarFade 0.7s ease both;
+}
+
+/* =============================================
+   FILA DE INPUT
+============================================= */
+.fila-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  animation: entrar 0.3s ease both;
+}
+
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.etiqueta-input {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--primario);
+  font-family: 'Space Mono', monospace;
+  min-width: 30px;
+  text-align: center;
+  background: rgba(108,99,255,0.12);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.input-link {
+  flex: 1;
+  background: var(--fondo-input);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 12px 16px;
+  color: var(--texto);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.92rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.input-link:focus {
+  border-color: var(--primario);
+  box-shadow: 0 0 0 3px var(--sombra);
+}
+
+.input-link::placeholder {
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+
+/* =============================================
+   BOTÓN ELIMINAR (por fila)
+============================================= */
+.btn-eliminar {
+  background: rgba(255, 101, 132, 0.12);
+  border: 2px solid rgba(255, 101, 132, 0.3);
+  color: var(--acento);
+  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-eliminar:hover {
+  background: rgba(255, 101, 132, 0.25);
+  border-color: var(--acento);
+  transform: scale(1.1);
+}
+
+.btn-eliminar:active {
+  transform: scale(0.95);
+}
+
+/* =============================================
+   ACCIONES GLOBALES
+============================================= */
+.acciones-globales {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.acciones-globales button {
+  flex: 1;
+  min-width: 130px;
+  padding: 13px 18px;
+  border: none;
+  border-radius: var(--radio);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+}
+
+.acciones-globales button:active {
+  transform: scale(0.96);
+}
+
+/* Botón Agregar */
+#btn-agregar {
+  background: var(--primario);
+  color: white;
+  box-shadow: 0 4px 20px rgba(108,99,255,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+#btn-agregar:hover {
+  background: var(--primario-hover);
+  box-shadow: 0 6px 24px rgba(108,99,255,0.55);
+  transform: translateY(-2px);
+}
+
+#btn-agregar span {
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+/* Botón Limpiar */
+.btn-limpiar {
+  background: rgba(255,255,255,0.06);
+  color: var(--texto-suave);
+  border: 2px solid var(--borde) !important;
+}
+
+.btn-limpiar:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--texto);
+  transform: translateY(-2px);
+}
+
+/* Botón Descargar */
+.btn-descargar {
+  background: var(--acento2);
+  color: #0f0e17;
+  box-shadow: 0 4px 20px rgba(67,217,173,0.35);
+}
+
+.btn-descargar:hover {
+  background: #36c49a;
+  box-shadow: 0 6px 24px rgba(67,217,173,0.5);
+  transform: translateY(-2px);
+}
+
+/* =============================================
+   ZONA DE ESTADO / MENSAJES
+============================================= */
+#zona-estado {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mensaje {
+  padding: 12px 18px;
+  border-radius: var(--radio);
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: entrar 0.3s ease both;
+}
+
+.mensaje.ok {
+  background: rgba(67, 217, 173, 0.12);
+  border: 1px solid rgba(67, 217, 173, 0.3);
+  color: var(--acento2);
+}
+
+.mensaje.error {
+  background: rgba(255, 101, 132, 0.12);
+  border: 1px solid rgba(255, 101, 132, 0.3);
+  color: var(--acento);
+}
+
+.mensaje.info {
+  background: rgba(108, 99, 255, 0.12);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  color: #a89ffc;
+}
+
+/* =============================================
+   FOOTER
+============================================= */
+.footer {
+  text-align: center;
+  margin-top: 24px;
+  color: var(--texto-suave);
+  font-size: 0.82rem;
+  animation: bajarFade 0.9s ease both;
+}
+
+.footer code {
+  background: rgba(108,99,255,0.15);
+  color: var(--primario);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+}
+
+/* =============================================
+   ANIMACIONES GENERALES
+============================================= */
+@keyframes bajarFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =============================================
+   RESPONSIVE
+============================================= */
+@media (max-width: 500px) {
+  .header h1 { font-size: 1.8rem; }
+  .card { padding: 20px 16px; }
+  .acciones-globales { flex-direction: column; }
+  .acciones-globales button { min-width: unset; }
+}

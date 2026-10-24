@@ -2,63 +2,56 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="/logo.svg" />
   <title>MP3 Downloader</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 </head>
 <body>
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 
-  <!-- Fondo decorativo con burbujas -->
-  <div class="bg-bubbles">
-    <span></span><span></span><span></span>
-    <span></span><span></span><span></span>
+  <div class="pantalla">
+    <section class="hero">
+      <canvas id="escena" aria-hidden="true"></canvas>
+      <div class="hero-text">
+        <h1 class="titulo"><span class="split">MP3 Downloader</span></h1>
+        <p class="rota">
+          Descarga tu
+          <span class="rota-ventana"><span id="palabra" class="palabra">música</span></span>
+        </p>
+        <ul class="chips">
+          <li>320 kbps</li>
+          <li>Varios enlaces</li>
+          <li>Sin registro</li>
+        </ul>
+      </div>
+    </section>
+
+    <main class="panel">
+      <div class="card">
+        <section class="group-header">
+          <h2>Tus enlaces</h2>
+          <span id="contador" class="contador">0 de 0</span>
+        </section>
+
+        <ul id="lista" class="list"></ul>
+
+        <button id="btn-agregar" class="row-button" type="button">
+          <span class="plus">+</span> Agregar enlace
+        </button>
+
+        <div class="actions">
+          <button id="btn-descargar" class="btn primary" type="button">Descargar todo</button>
+          <button id="btn-limpiar" class="btn secondary" type="button">Limpiar</button>
+        </div>
+
+        <p class="footnote">YouTube y otras plataformas compatibles. El audio se guarda en MP3.</p>
+      </div>
+    </main>
   </div>
 
-  <div class="container">
+  <div id="estado" class="status" aria-live="polite"></div>
 
-    <!-- Cabecera -->
-    <header class="header">
-      <div class="logo">
-        <span class="logo-icon">🎵</span>
-        <h1>MP3 <span>Downloader</span></h1>
-      </div>
-      <p class="subtitle">Pega tus links y descarga tu música fácilmente</p>
-    </header>
-
-    <!-- Tarjeta principal -->
-    <div class="card">
-
-      <!-- Lista de inputs -->
-      <div id="lista-inputs">
-        <!-- El primer input se crea desde JS -->
-      </div>
-
-      <!-- Botones de acción global -->
-      <div class="acciones-globales">
-        <button id="btn-agregar" onclick="agregarInput()">
-          <span>＋</span> Agregar link
-        </button>
-        <button id="btn-limpiar" class="btn-limpiar" onclick="limpiarTodo()">
-          🧹 Limpiar todo
-        </button>
-        <button id="btn-descargar" class="btn-descargar" onclick="descargarTodo()">
-          ⬇️ Descargar todo
-        </button>
-      </div>
-
-    </div>
-
-    <!-- Zona de estado / mensajes -->
-    <div id="zona-estado"></div>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <p>Solo pega el link directo al archivo <code>.mp3</code> para descargar sin problemas 🎶</p>
-    </footer>
-
-  </div>
-
-  <script src="script.js"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
